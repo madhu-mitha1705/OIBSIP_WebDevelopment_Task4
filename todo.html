@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Task Manager</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      margin: 30px 0 10px;
+      font-size: 2rem;
+      text-shadow: 1px 1px 5px #000;
+    }
+
+    .input-box {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+      width: 90%;
+      max-width: 700px;
+      margin-bottom: 20px;
+    }
+
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    input, textarea {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    button.add-btn {
+      background: #00c6ff;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button.add-btn:hover {
+      background: #0072ff;
+      color: #fff;
+    }
+
+    .columns {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 90%;
+      max-width: 1200px;
+    }
+
+    @media (min-width: 768px) {
+      .columns {
+        flex-direction: row;
+        justify-content: space-between;
+      }
+    }
+
+    .column {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 15px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    .column h2 {
+      text-align: center;
+      margin-top: 0;
+      font-size: 1.4rem;
+      color: #00d4ff;
+    }
+
+    .task {
+      background: rgba(255, 255, 255, 0.12);
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .actions {
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .actions button {
+      width: 48%;
+      font-size: 0.85rem;
+    }
+
+    .timestamp {
+      font-size: 0.8rem;
+      color: #bbb;
+      margin-top: 5px;
+    }
+
+    .logout-btn {
+      margin: 30px 0 15px;
+      padding: 6px 14px;
+      background: #2d84db;
+      color: rgb(9, 8, 8);
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      width: auto; 
+      display: inline-block;
+    }
+
+    .logout-btn:hover {
+      background: #6997b1;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📝 My TO-DO LIST</h1>
+
+  <div class="input-box">
+    <input id="title" type="text" placeholder="Task title" />
+    <textarea id="desc" rows="2" placeholder="Task description"></textarea>
+    <button class="add-btn" onclick="addTask()">Add Task</button>
+  </div>
+
+  <div class="columns">
+    <div class="column">
+      <h2>📌 Pending Tasks</h2>
+      <div id="pendingTasks"></div>
+    </div>
+    <div class="column">
+      <h2>✅ Completed Tasks</h2>
+      <div id="completedTasks"></div>
+    </div>
+  </div>
+
+  <button class="logout-btn" onclick="logout()">Logout</button>
+
+  <script>
+    // Redirect to login if not logged in
+    if (!localStorage.getItem("loggedIn")) {
+      window.location.href = "login.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("loggedIn");
+      window.location.href = "login.html";
+    }
+
+    function addTask() {
+      const title = document.getElementById("title").value.trim();
+      const desc = document.getElementById("desc").value.trim();
+      if (!title || !desc) {
+        alert("Please enter both title and description.");
+        return;
+      }
+
+      const task = document.createElement("div");
+      task.className = "task";
+
+      const now = new Date().toLocaleString();
+
+      task.innerHTML = `
+        <strong>${title}</strong>
+        <p>${desc}</p>
+        <span class="timestamp">Added on: ${now}</span>
+        <div class="actions">
+          <button onclick="markComplete(this)">Complete</button>
+          <button onclick="this.parentElement.parentElement.remove()">Delete</button>
+        </div>
+      `;
+
+      document.getElementById("pendingTasks").prepend(task);
+      document.getElementById("title").value = "";
+      document.getElementById("desc").value = "";
+    }
+
+    function markComplete(button) {
+      const task = button.parentElement.parentElement;
+      task.querySelector(".actions").innerHTML = `
+        <button onclick="this.parentElement.parentElement.remove()">Delete</button>
+      `;
+      document.getElementById("completedTasks").prepend(task);
+    }
+  </script>
+
+</body>
+</html>
